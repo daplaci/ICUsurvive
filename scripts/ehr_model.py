@@ -161,23 +161,10 @@ json_file = json.load(open('/home/projects/icu/final_gum/jsons_surv/train_{}.jso
 json_count = json.load(open('/home/projects/icu/final_gum/jsons_surv/counts_train_{}.json'.format(args.diag_level), 'r'))
 print ("Json Loaded")
 
-filter_table = pd.read_csv("/home/projects/icu/final_gum/output/courseid_permission_regH.csv", sep='\t').astype(str)
-courseid2permission = dict(zip(filter_table.courseid_unique, filter_table.perm_both))
-
-for k in list(json_file.keys()):
-    if courseid2permission[k] != '1':
-        del json_file[k]
-assert len(json_file) == 10498
-
 if args.save_all:
     print ("Loading Validation json.. ", end='\r')
     json_val_file = json.load(open('/home/projects/icu/final_gum/jsons_surv/val_{}.json'.format(args.diag_level), 'r'))
     print ("Val Json Loaded")
-    
-    for k in list(json_val_file.keys()):
-        if courseid2permission[k] != '1':
-            del json_val_file[k]
-    assert len(json_val_file) == 2753
 
 else:
     json_val_file = None
