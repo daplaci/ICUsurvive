@@ -1,0 +1,10 @@
+.DS_Store
+data
+.snakemake/
+__pycache__/
+*.pyc
+output/
+input/
+notebook/
+.snakemake/
+.snakemake_log/
