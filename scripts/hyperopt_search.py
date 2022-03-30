@@ -17,7 +17,7 @@ import os, hashlib
 CMD = '''#!/bin/bash
 '''
 path = os.getcwd()
-nnet_file = "ehr_model.py"
+nnet_file = "main.py"
 
 #here the additional parameter that are not included in the grid search are specified
 args = utils.parse_args()
@@ -67,7 +67,7 @@ def optim_metric(dynamic_args):
     shellfile = open('moab_jobs/{}'.format(filename), 'w')
     shellfile.write(CMD)
     shellfile.write('cd ' + path + '\n')
-    shellfile.write(shell_arg + '\n') #+ ' >logs/{}.log 2>&1 &\n'.format(file_name_joined))
+    shellfile.write(shell_arg + '\n')
     shellfile.close()
     st = os.stat('moab_jobs/{}'.format(filename))
     os.chmod('moab_jobs/{}'.format(filename), st.st_mode | stat.S_IEXEC)
@@ -86,33 +86,10 @@ def optim_metric(dynamic_args):
     optimization_param = np.amin(subset.val_loss.values)
     return optimization_param
 
-def merge_trials(trials1, trials2_slice):
-    max_tid = max([trial['tid'] for trial in trials1.trials])
-    for trial in trials2_slice:
-        duplicates = [d == trial for d in trials1]
-        if any(duplicates): 
-            print ("Ignoring {} trials duplicate".format(sum(duplicates)))
-            continue 
-
-        tid = trial['tid'] + max_tid + 1
-        hyperopt_trial = Trials().new_trial_docs(
-                tids=[None],
-                specs=[None],
-                results=[None],
-                miscs=[None])
-        hyperopt_trial[0] = trial
-        hyperopt_trial[0]['tid'] = tid
-        hyperopt_trial[0]['misc']['tid'] = tid
-        for key in hyperopt_trial[0]['misc']['idxs'].keys():
-            hyperopt_trial[0]['misc']['idxs'][key] = [tid]
-        trials1.insert_trial_docs(hyperopt_trial) 
-        trials1.refresh()
-    return trials1
-
 trial = Trials()
 max_evals = 150
 trials_file = "trials_baseline{}.pkl".format(param_dict["baseline_hour"])
-##### or this
+
 while True:
     if trials_file in os.listdir('best_weights/'):
         trial = pickle.load(open('best_weights/{}'.format(trials_file),'rb'))
@@ -126,31 +103,4 @@ while True:
         pickle.dump(trial, f)
 
     if trial.__len__()>max_evals:
-        break    
-
-
-# trial = Trials()
-# max_evals = 150
-# trials_file = "trials_baseline{}.pkl".format(param_dict["baseline_hour"])
-# ##### or this
-# while True:
-#     if trials_file in os.listdir('best_weights/'):
-#         trial = pickle.load(open('best_weights/{}'.format(trials_file),'rb'))
-    
-#     best = fmin(optim_metric, search_space, algo=hyperopt.tpe.suggest, 
-#         max_evals=(trial.__len__() +1), trials=trial, show_progressbar=False)
-
-#     trial.refresh()
-
-#     if trials_file in os.listdir('best_weights/'):
-#         old_trial = pickle.load(open('best_weights/{}'.format(trials_file),'rb'))
-#         trial = merge_trials(old_trial, trial)
-
-#     with open('best_weights/{}'.format(trials_file), 'wb') as f:
-#         pickle.dump(trial, f)
-
-#     if trial.__len__()>max_evals:
-#         break    
-
-# import pdb;pdb.set_trace()
-# sys.exit(0)
+        break
