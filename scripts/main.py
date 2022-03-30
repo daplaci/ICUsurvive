@@ -16,7 +16,7 @@ from pathos.multiprocessing import ProcessingPool
 from multiprocessing import Pool
 import writer
 import sys
-import create_y_train
+import nnet_survival
 
 args = utils.parse_args()
 
@@ -183,7 +183,7 @@ if __name__=="__main__":
     pids_to_static = {'ageadm':pids_to_age, 'los_before_icu': pids_to_los_before_icu}
 
     breaks = np.array([0] + [int(x) for x in args.n_window.split('-')])  # Make list of integers from e.g ['1-7-14-30-90'] - add 0
-    survivals = create_y_train.make_surv_array((lpr_table.failure_time - args.baseline_hour//24), lpr_table.failure, breaks)
+    survivals = nnet_survival.make_surv_array((lpr_table.failure_time - args.baseline_hour//24), lpr_table.failure, breaks)
 
     pids_to_survival = dict(zip(lpr_table.courseid_unique.astype(str), survivals))
     y_window = np.asarray([list(pids_to_survival[p]) for p in pids])

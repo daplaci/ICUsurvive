@@ -1,20 +1,11 @@
-import traceback, os
+import traceback
 import numpy as np
 import pandas as pd
-import data_utils, metrics
-from keras.models import Model
-from keras.layers import Dense, LSTM, Input, Masking, CuDNNLSTM, GRU, CuDNNGRU, Bidirectional, Dropout
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
-from sklearn.model_selection import StratifiedKFold, train_test_split
-from sklearn.metrics import roc_auc_score, matthews_corrcoef
-from keras import backend as K
+from sklearn.metrics import roc_auc_score
 from copy import deepcopy
-import hashlib
-import nnet_survival
 from sksurv.metrics import concordance_index_censored as ci
 
 stripper = lambda x : str(x[0]) if ((type(x) is tuple or type(x) is list) and len(x)==1)  else str(x)
-
 
 class DF_writer():
     def __init__(self, pids, breaks):
@@ -24,8 +15,6 @@ class DF_writer():
         self.errorHeader = list(pd.read_csv('error.log', sep='\t', nrows=1).columns.values)
         self.pids = pids
         self.breaks = breaks
-        #self.id_col = 'courseid_unique' if 'courseid_unique' in self.metadata.columns else 'v_cpr_enc'
-        #self.auc_cum_dict = {}
     
     def write_progress(self):
         print("Writing the progress of this Job")

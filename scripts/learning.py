@@ -1,17 +1,8 @@
-import traceback
 import numpy as np
-import pandas as pd
-import data_utils, metrics
-from keras.models import Model
-from keras.layers import Dense, LSTM, Input, Masking
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
-from sklearn.model_selection import StratifiedKFold, train_test_split
-from sklearn.metrics import roc_auc_score, matthews_corrcoef
-from sklearn.metrics import roc_curve, auc
+import data_utils
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 from sklearn.utils import class_weight
-import writer
 import model_generator
-import metrics
 import pickle
 import hashlib
 
@@ -19,8 +10,6 @@ stripper = lambda x : x[0] if ((type(x) is tuple or type(x) is list)and len(x)==
 
 
 def train_model(X_window, y_window , args, df_writer):
-
-    ### MODEL ARCHITECTURE ###
 
     initial_model_weights_to_encode = '.'.join([str(header) + '_' + str(stripper(args.__dict__[header])) for header in df_writer.AUCheader if header in args.__dict__.keys() and header!= 'cv_num'])
     assert 'cv_num' not in initial_model_weights_to_encode

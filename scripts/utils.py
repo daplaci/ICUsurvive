@@ -1,9 +1,5 @@
 import argparse
-import pandas as pd
-import numpy as np
 import os
-import traceback
-#from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import roc_auc_score
 
 
@@ -109,14 +105,6 @@ def parse_args(args_str=None):
     args.lpr_metadata = args.input_dir + 'list_of_codes_before_adm.tsv'
     args.metadata_path = args.base_dir + 'metadata/metadata.tsv'
     args.notes_metadata_path = args.base_dir + 'metadata/metadata_notes.tsv'
-    
-    # args.base_dir = '/home/projects/icu/final_gum/'
-    # args.script_dir = '/home/projects/icu/final_gum/scripts/'
-    # args.input_dir = '/home/projects/icu/final_gum/jsons/'
-    # args.output_dir = '/home/projects/icu/final_gum/output/' + args.date_string
-    # args.lpr_metadata = args.input_dir + 'list_of_codes_before_adm.tsv'
-    # args.metadata_path = args.base_dir + 'metadata/metadata.tsv'
-    # args.notes_metadata_path = args.base_dir + 'metadata/metadata_notes.tsv'
 
     args = apply_restrictions(args)
 
@@ -130,15 +118,3 @@ def apply_restrictions(args):
         raise Warning("You are using LPR data for training with the maximum batch size.. it will cause memori exception")
         
     return args
-
-stripper = lambda x : str(x[0]) if ((type(x) is tuple or type(x) is list) and len(x)==1)  else str(x)
-  
-def remove_moab_script(args, df_writer):
-    print ("Removing moab script..")
-    args.n_window = '-'.join(map(str, args.window_list))
-    moab_file_name = '.'.join([args.date_string] + [str(header) + '_' + stripper(args.__dict__[header]) for header in df_writer.AUCheader if header in args.__dict__.keys() and header!='cv_num'])
-    moab_file_name+='.sh'
-    os.remove(args.output_dir + '/moab_jobs/' + moab_file_name)
-    assert moab_file_name not in os.listdir(args.output_dir + '/moab_jobs/')
-    print ("Done")
-

@@ -1,11 +1,10 @@
-#nnet_survival.py
+#Author: Michael Gensheimer, Stanford University, michael.gensheimer@gmail.com
+#Tested with Python version 3.6 and Keras version 2 (using TensorFlow backend)
+#Refer to DOI 10.7717/peerj.6257 and https://github.com/MGensheimer/nnet-survival for original implementation.
 #
 #Functions used in neural network survival model.
 #To use in your program, either go the directory containing nnet_survival.py and then start Python,
 #or add that directory to Python path.
-#
-#Author: Michael Gensheimer, Stanford University, michael.gensheimer@gmail.com
-#Tested with Python version 3.6 and Keras version 2 (using TensorFlow backend)
 
 from __future__ import print_function
 import numpy as np
