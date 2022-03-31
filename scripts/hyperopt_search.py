@@ -4,7 +4,7 @@ from hyperopt import fmin, tpe, hp, STATUS_OK, Trials, pyll, trials_from_docs
 from hyperopt.base import SONify
 import hyperopt
 import os, itertools, time, shutil, sys, stat, subprocess, pdb, random
-import utils
+import parser
 from threading import Thread
 import time, pickle
 import pandas as pd
@@ -20,7 +20,7 @@ path = os.getcwd()
 nnet_file = "main.py"
 
 #here the additional parameter that are not included in the grid search are specified
-args = utils.parse_args()
+args = parser.parse_args()
 moab_params = [k for argv in sys.argv[1:] for k in args.__dict__.keys() if k in argv]
 additional_dict = {k: args.__dict__[k] for k in moab_params}
 

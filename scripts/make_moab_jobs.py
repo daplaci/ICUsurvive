@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
 import os, itertools, time, shutil, sys, stat, subprocess, pdb
-import utils
+import parser
 
 #here the additional parameter that are not included in the grid search are specified
-args = utils.parse_args()
+args = parser.parse_args()
 moab_params = [k for argv in sys.argv[1:] for k in args.__dict__.keys() if k in argv]
 additional_params = ' '.join([' --'+str(k)+ '='+ str(args.__dict__[k]) for k in moab_params])
 

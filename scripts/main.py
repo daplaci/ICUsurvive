@@ -8,7 +8,7 @@ from keras.layers import Lambda,AveragePooling2D
 from keras import backend as K
 from tqdm import tqdm
 import pdb,os, pickle
-import utils
+import parser
 import learning
 import data_utils
 from p_tqdm import *
@@ -18,7 +18,7 @@ import writer
 import sys
 import nnet_survival
 
-args = utils.parse_args()
+args = parser.parse_args()
 
 #DEFINE FUNCTIONS
 #function to sort the time step as a list
