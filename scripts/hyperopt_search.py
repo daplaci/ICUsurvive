@@ -1,16 +1,11 @@
 #!/usr/bin/python
-import concurrent.futures
-from hyperopt import fmin, tpe, hp, STATUS_OK, Trials, pyll, trials_from_docs
-from hyperopt.base import SONify
+from hyperopt import fmin, hp, STATUS_OK, Trials
 import hyperopt
-import os, itertools, time, shutil, sys, stat, subprocess, pdb, random
+import os, time, sys, stat, subprocess
 import parser
-from threading import Thread
 import time, pickle
 import pandas as pd
 import numpy as np
-from functools import partial
-import multiprocessing 
 import sys
 import os, hashlib
 

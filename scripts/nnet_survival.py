@@ -9,7 +9,6 @@
 from __future__ import print_function
 import numpy as np
 import keras.backend as K
-from keras.engine.topology import Layer
 
 def surv_likelihood(n_intervals):
     """Create custom Keras loss function for neural network survival model. 

@@ -75,9 +75,7 @@ def parse_args(args_str=None):
     parser.add_argument('--padd_percentile', type=int, default=95, help='number of padd diag code')
     parser.add_argument('--min_word_count', type=int, default=100, help='minimum number of words to be added in the dictionary')
     parser.add_argument('--diag_level', type=str, default="block", help='decide between block and l3')
-    parser.add_argument('--apply_pre_attention', type=str2bool, default=False, help='apply attention before lstm - on feature level')
-    parser.add_argument('--apply_post_attention', type=str2bool, default=False, help='apply attention after lstm - on time step level ')
-
+    
     #args for notes
     args = parser.parse_args()
   

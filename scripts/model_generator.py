@@ -1,17 +1,8 @@
 import os
-import traceback
-import numpy as np
-import pandas as pd
-import data_utils, metrics
 from keras.models import Model
-from keras.layers import Concatenate, Dense,Embedding, LSTM, Input, Masking ,SeparableConv2D, DepthwiseConv2D, BatchNormalization
-from keras.layers import CuDNNLSTM, GRU, CuDNNGRU, Bidirectional, Dropout, Concatenate,Lambda, GlobalAveragePooling1D, Reshape, Permute
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
-from sklearn.model_selection import StratifiedKFold, train_test_split
-from sklearn.metrics import roc_auc_score, matthews_corrcoef    
+from keras.layers import Concatenate, Dense,Embedding, LSTM, Input, BatchNormalization
+from keras.layers import CuDNNLSTM, GRU, CuDNNGRU, Dropout, Concatenate, Reshape
 from keras import backend as K
-from copy import deepcopy
-from keras.layers import RepeatVector
 from keras.regularizers import l2
 import nnet_survival
 
@@ -72,39 +63,15 @@ class ModelConstructor():
         pool = BatchNormalization()(pool)
         return input_layer, pool
 
-    def apply_attention(self, input_attention, axis='feat'):
-        input_dim = int(input_attention.shape[2])
-        time_steps = self.args.padd_time
-        if axis == 'time':
-            input_attention = Permute((2, 1))(input_attention)
-            a = Dense(time_steps, activation='softmax', name='apply_softmax_{}'.format(axis), kernel_regularizer=l2(self.args.l2_regularizer), bias_regularizer=l2(self.args.l2_regularizer))(input_attention)
-        else:
-            a = Dense(input_dim, activation='softmax', name='apply_softmax_feat', kernel_regularizer=l2(self.args.l2_regularizer), bias_regularizer=l2(self.args.l2_regularizer))(input_attention)
-        
-        a = Lambda(lambda x: K.mean(x, axis=1), name='mean_reduction_{}'.format(axis))(a)
-        a = Lambda(lambda x: K.expand_dims(x, axis=-1))(a)
-        output_attention_mul = Lambda(lambda x: K.batch_dot(x[0], x[1]), name='attention_mul_{}'.format(axis))([input_attention, a])
-        if axis=='time':
-            output_attention_mul = Lambda(lambda x: K.squeeze(x, axis=2))(output_attention_mul)
-        else:
-            output_attention_mul = Lambda(lambda x: K.repeat_elements(x, input_dim, -1))(output_attention_mul)
-        return output_attention_mul
-
     @register('ehr')
     def ehr_model(self,inputs):
-        ###############################################    
+
         input_layers, pools = map(list, zip(*[self.get_feat_embedding(feat_obj) for feat_obj in inputs]))
 
         input_lstm = Concatenate(-1)(pools)
         input_lstm = Dropout(self.args.dropout)(input_lstm)
-        #if self.args.apply_attention:
-        if self.args.apply_pre_attention:
-            input_lstm = self.apply_attention(input_lstm)
-        
+
         output_lstm = self.recurrent_layer(**self.recurrent_args)(input_lstm)
-        
-        if self.args.apply_post_attention:
-            output_lstm = self.apply_attention(output_lstm, axis='time')
         
         prediction = Dense(len(self.args.window_list), activation='sigmoid', kernel_regularizer=l2(self.args.l2_regularizer), bias_regularizer=l2(self.args.l2_regularizer))(output_lstm)
 

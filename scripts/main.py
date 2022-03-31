@@ -2,20 +2,12 @@ import keras
 import json
 import pandas as pd
 import numpy as np
-from keras.models import Model
-from keras.layers import Dense, Embedding , LSTM, Input, Concatenate, Reshape
-from keras.layers import Lambda,AveragePooling2D
-from keras import backend as K
 from tqdm import tqdm
-import pdb,os, pickle
+import os, pickle
 import parser
 import learning
 import data_utils
-from p_tqdm import *
-from pathos.multiprocessing import ProcessingPool
-from multiprocessing import Pool
 import writer
-import sys
 import nnet_survival
 
 args = parser.parse_args()
@@ -129,9 +121,6 @@ class DomainClass():
     
     def padder(self, x, max_len, tkn=0):
         return [tkn]*(max_len - len(x)) + x[-max_len:]
-
-def parallel_extract_data(obj):
-    return obj.extract_data()
 
 def get_padd(json_file, pids, percentile):
     padd_dict = {}
