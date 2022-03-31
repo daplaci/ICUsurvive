@@ -1,7 +1,13 @@
 #!/usr/bin/python
-
-import os, itertools, time, shutil, sys, stat, subprocess, pdb
+import os
+from os.path import dirname, realpath
 import parser
+import time
+import shutil
+import sys
+import stat
+import subprocess
+import itertools
 
 #here the additional parameter that are not included in the grid search are specified
 args = parser.parse_args()
@@ -13,31 +19,17 @@ print ("additional params:", additional_params)
 # with Python2 the dict is not in alphabetic order
 assert (sys.version_info > (3, 0)), "This script only works with Python3!"
 
-script_dir = '/home/people/daplaci/git_gum/scripts/'
-base_dir = '/home/people/daplaci/git_gum/'
-input_dir = '/home/people/daplaci/git_gum/input/'
-output_dir = '/home/people/daplaci/git_gum/output/'
+script_dir = dirname(realpath(__file__))
+input_dir = os.path.join(dirname(script_dir), 'input')
+output_dir = os.path.join(dirname(script_dir), 'output')
 nnet_file = 'hyperopt_search.py'
 batch_file = 'run_models.sh'
 list_file_to_copy = os.listdir(script_dir)
 
-
-# make parameter dictionary
+# This will run a grid search with all the following paramters.
 param_dict={}
 param_dict['n_window'] = ['1-7-14-30-90-365']
-# param_dict['recurrent_layer'] = ['lstm']
-param_dict['baseline_hour'] = [0,24,48,72]
-# param_dict['units'] = [216]
-# param_dict['batch'] = [128]
-# param_dict['l2_regularizer'] = [0.000973591634224646]
-# param_dict['embedding_coeff'] = [0.136160010477897]
-# param_dict['dropout'] = [0.143712093485934]
-# param_dict['recurrent_dropout'] = [0.885876590955943]
-# param_dict['padd_percentile'] = [94]
-# param_dict['optimizer'] = ["Adagrad"]
-# param_dict['save_all'] = [True]
-# param_dict['exp_id'] = ["4ecb89aac9844a3b862728d77879f1a4"]
-
+param_dict['baseline_hour'] = [24]
 
 # do not run this, if an other script is just trying to import 'param_dict'
 if __name__ == '__main__':
@@ -59,11 +51,12 @@ if __name__ == '__main__':
 Insert a string without spaces: """.format(arg))
         date_string += name_folder_add
         
-        os.chdir(output_dir)
+        path = os.path.join(output_dir, date_string)
+        os.makedirs(path)
         
-        os.mkdir(date_string)
-        path = "".join([output_dir, date_string])
-        if args.debug: print ("Run your grid_search in the folder called ", path)
+        if args.debug: 
+            print ("Run your grid_search in the folder called ", path)
+        
         os.chdir(path)
         os.mkdir('best_weights')
         os.mkdir('auc_temp')
@@ -73,8 +66,6 @@ Insert a string without spaces: """.format(arg))
         os.system('chmod -R 700 moab_jobs/')
         
         # save this script to path
-        filename = "".join([script_dir, sys.argv[0]])
-        shutil.copy2(filename, path)
         for file_to_copy in list_file_to_copy:
             if ('.py' in file_to_copy) or ('.R' in file_to_copy):
                 shutil.copy2(os.path.join(script_dir, file_to_copy), path)
@@ -152,16 +143,13 @@ Insert a string without spaces: """.format(arg))
             else:
                 file_name_joined = '.'.join([param for header in AUCheader for param in file_name if header in param])
 
-            shell_arg += " > logs/{}.log 2>&1".format(file_name_joined) ####check this __it can be wrong 
+            shell_arg += " > logs/{}.log 2>&1".format(file_name_joined)
             shellfile = open('moab_jobs/%s.sh' % file_name_joined, 'w')
             shellfile.write(CMD)
             shellfile.write('cd ' + path + '\n')
-            shellfile.write(shell_arg + '\n')#+ ' >logs/{}.log 2>&1 &\n'.format(file_name_joined)
+            shellfile.write(shell_arg + '\n')
             shellfile.close()
         
             #run batch-scripts
             run_models_path = '/'.join([path, r'run_models.sh'])
             subprocess.call([run_models_path])
-          
-          #subprocess.call('nohup python -u moab_watcher.py > moab_watcher.log 2>&1 &', shell=True) # -u streams the output directly to the output file
-          
